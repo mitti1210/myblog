@@ -182,3 +182,67 @@ fgsingle_bar<-function(dr,dq,da,qNo,
            ggbars+theme+geom_bar(stat="identity",fill=palette)
          }
 fgsingle_bar(dr=d01r,dq=d01q,da=d01a,qNo=1)
+
+i<-5
+d02r<-select(d01r,contains(qID[i])) #i 番目の回答データ
+d02q<-d01q[i,"question"] #i 番目の設問文
+d02g<-d01q[i,"graph"] #i 番目のグラフの種類
+d02_ord<-d01q[i,"order"] #i 番目の x の並べ方
+d02a_0<-d01a[,qID[i]] #i 番目の選択肢
+d02a_0<-d02a_0[d02a_0!=""] #選択肢から空白を削除
+na01<-length(d02a_0) #選択肢の数をカウント
+
+
+
+fgmulti<-function(dr,dq,da,qNo,xord01=NULL,
+                  theme=gfbars,palette=cb_palette[3]){
+   #データの読み込み
+     d02r<-select(dr,contains(qID[qNo])) #i 番目の回答データ
+     d02q<-dq[i,"question"] #i 番目の設問文
+     d02g<-dq[i,"graph"] #i 番目のグラフの種類
+     d02_ord<-dq[i,"order"] #i 番目の x の並べ方
+     d02a_0<-da[,qID[i]] #i 番目の選択肢
+     d02a_0<-d02a_0[d02a_0!=""] #選択肢から空白を削除
+     na01<-length(d02a_0) #選択肢の数をカウント
+    
+       #各選択肢の指摘率
+       d02_p1<-apply(d02r,2,sum)
+       d02_p0<-apply(d02r,2,length)
+       prop_1<-d02_p1/d02_p0
+       p02<-data.frame(x=1:na01,
+                        xtext=d02a_0,
+                        freq=t(d02_p1),
+                        prop=t(prop_1))
+       
+          #X 軸の並べ方を指定する
+          if(d02_ord=="同"){
+            xord<--p02$aID
+            }else if(d02_ord=="大"){
+              xord<-p02$prop
+              xord[grepl("その他",p02$xtext)]<--1
+              }else{
+                xord<--xord01
+                }
+       
+          #グラフの定義
+          ttl01<-paste(d02q,"\n","（",d02g,"N=",d02_p0[1],"）") #グラフタイトル
+        ggbars<-ggplot(p02, #データを指定
+                         aes(x=reorder(x=xtext,X=xord), #X 軸は xtext を xord の順番で
+                               y=prop_1))+ #Y 軸は prop のデータを
+          coord_flip()+ #横棒グラフに　
+          scale_y_continuous(labels=scales::percent, #Y 軸の目盛は％表記
+                               limits=c(0,1))+ #Y 軸の範囲は 0～1
+          geom_text( #データラベルを記入
+            aes(y=prop_1, #ラベルの位置
+                  label=sprintf("%.1f%%",prop_1*100)), #prop*100 を、数点以下 1 桁で％表記
+            size=4, #ラベルの文字サイズは 4
+            hjust=-0.1)+ #ラベルの位置調整、0.1 大きく
+          ggtitle(ttl01)+ #グラフタイトル
+          guides(fill=FALSE) #凡例は非表示
+       
+          #グラフを表示
+          ggbars+theme+geom_bar(stat="identity",fill=palette)
+        }
+
+
+fgmulti(dr=d01r,dq=d01q,da=d01a,qNo=5)
