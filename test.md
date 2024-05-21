@@ -1,6 +1,5 @@
 ```mermaid
 graph TD
-graph TD
   A[Bayesian-Proportional-Recovery-master.zip]
   A1[README.md]
   A2[processData.m]
