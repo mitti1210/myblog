@@ -2,7 +2,7 @@ customer_id,previous_service,current_service
 1,Basic,Premium
 2,Basic,Basic
 3,Premium,Premium
-4.Standard,Premium
+4,Standard,Premium
 5,Basic,Standard
 6,Standard,Standard
 7,Premium,Basic
